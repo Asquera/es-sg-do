@@ -1,0 +1,17 @@
+- hosts: localhost
+  vars_files:
+    - settings.yml
+  connection: local
+  gather_facts: false
+  tasks:
+    - include: tasks/digitalocean.yml
+
+- hosts: es-nodes
+  # We gather facts later.
+  gather_facts: false
+  pre_tasks:
+    - include: tasks/ansible-requirements.yml
+  vars_files:
+    - settings.yml
+  tasks:
+    - include: tasks/es-node.yml

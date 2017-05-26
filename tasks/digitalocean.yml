@@ -1,0 +1,40 @@
+- name: Create each node
+  register: jobs
+  with_sequence: start=1 end={{ num_nodes }}
+  digital_ocean:
+    command: droplet
+    name: "es-node-{{item}}"
+    state: present
+    size_id: "{{ droplet_size }}"
+    image_id: ubuntu-16-10-x64
+    region_id: fra1
+    private_networking: yes
+    ssh_key_ids: "{{ users.values() | map(attribute='key_id') | list }}"
+    unique_name: yes
+    api_token: "{{ token }}"
+  async: 7200
+  poll: 0
+  changed_when: false # Later task will show changed.
+
+
+- name: Wait for machines to spawn.
+  with_items: "{{ jobs.results }}"
+  async_status: jid={{ item.ansible_job_id }}
+  poll: 10
+  retries: 20
+  register: nodes
+  until: nodes.finished
+
+- name: Tag nodes
+  digital_ocean_tag:
+    name: "es-nodes"
+    resource_id: "{{ item.droplet.id }}"
+    api_token: "{{ token }}"
+  with_items: "{{ nodes.results }}"
+
+- name: Add hosts to inventory
+  with_items: "{{ nodes.results }}"
+  add_host:
+    name: "{{ item.droplet.ip_address }}"
+    groups: es-nodes
+  changed_when: false # The result doesn't really matter.

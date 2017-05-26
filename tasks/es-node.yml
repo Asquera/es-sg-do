@@ -1,0 +1,51 @@
+# Java
+- name: Accept Oracle Java license
+  debconf:
+    name: oracle-java8-installer
+    question: shared/accepted-oracle-license-v1-1
+    value: true
+    vtype: boolean
+- name: Add Oracle Java PPA
+  apt_repository:
+    repo: ppa:webupd8team/java
+- name: Install Oracle Java
+  apt:
+    name: oracle-java8-installer
+
+# Elasticsearch
+- name: Setup Elasticsearch key
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+- name: Add Elasticsearch apt repo
+  apt_repository:
+    repo: deb https://artifacts.elastic.co/packages/5.x/apt stable main
+- name: Install Elasticsearch
+  apt:
+    name: elasticsearch
+
+# Plugin
+# - name: Check if search guard is installed
+#   stat: path=/usr/share/elasticsearch/plugins/search-guard-5
+#   register: search_guard_exists
+# - name: Install search guard
+#   elasticsearch_plugin:
+#     name: com.floragunn:search-guard-5:5.4.0-12
+#     plugin_bin: /usr/share/elasticsearch/bin/elasticsearch-plugin
+#     timeout: null
+#   when: not search_guard_exists.stat.exists
+
+# Configure
+- name: Inject Elasticsearch configuration
+  template:
+    src: files/elasticsearch.yml
+    dest: /etc/elasticsearch/elasticsearch.yml
+- name: Inject Elasticsearch jvm options
+  template:
+    src: files/jvm.options
+    dest: /etc/elasticsearch/jvm.options
+
+- name: Enable the elasticsearch service
+  systemd:
+    name: elasticsearch
+    state: started
+    enabled: true

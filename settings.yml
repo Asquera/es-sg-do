@@ -1,0 +1,12 @@
+- token: "{{ lookup('ini', 'api_token section=digital_ocean file=digital_ocean.ini') }}"
+- cluster_name: test
+- droplet_size: 1gb # 1gb, 512mb
+- es_heap_size: 500m # 1g, 500m
+- num_nodes: 2
+- users:
+    andrew:
+      key_id: 2724076
+    felix:
+      key_id: 2724077
+    ernesto:
+      key_id: 6448725
