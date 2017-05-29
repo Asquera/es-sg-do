@@ -1,1 +1,5 @@
 digital_ocean.ini
+*.cache
+*.retry
+**/.DS_Store
+env/
