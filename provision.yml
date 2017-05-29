@@ -6,11 +6,23 @@
   tasks:
     - include: tasks/digitalocean.yml
 
+# Gather node facts (and setup requirements) before setting up PKI.
 - hosts: es-nodes
-  # We gather facts later.
+  # Gather facts at the end of the tasks.
   gather_facts: false
-  pre_tasks:
+  vars_files:
+    - settings.yml
+  tasks:
     - include: tasks/ansible-requirements.yml
+
+- hosts: localhost
+  vars_files:
+    - settings.yml
+  connection: local
+  tasks:
+    - include: tasks/pki.yml
+
+- hosts: es-nodes
   vars_files:
     - settings.yml
   tasks:

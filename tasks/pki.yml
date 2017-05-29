@@ -1,0 +1,18 @@
+- name: Generate root CA
+  command: ./gen_root_ca.sh {{ ca_pass }} {{ truststore_pass }}
+  args:
+    chdir: pki/
+    creates: ca/root-ca
+
+- name: Generate node certificates
+  command: ./gen_node_cert.sh {{ hostvars[item].ansible_hostname }} {{ hostvars[item].ansible_eth1.ipv4.address }} {{ ca_pass }} {{ truststore_pass }}
+  args:
+    chdir: pki/
+    creates: "{{ hostvars[item].ansible_hostname }}-keystore.jks"
+  with_inventory_hostnames: es-nodes
+
+- name: Generate client certificate
+  command: ./gen_client_node_cert.sh admin {{ ca_pass }} {{ truststore_pass }}
+  args:
+    chdir: pki/
+    creates: admin-keystore.jks

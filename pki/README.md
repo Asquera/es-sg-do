@@ -1,0 +1,1 @@
+Based on https://github.com/floragunncom/search-guard-ssl/tree/5.3.0

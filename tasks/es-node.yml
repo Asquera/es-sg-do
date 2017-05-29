@@ -24,28 +24,73 @@
     name: elasticsearch
 
 # Plugin
-# - name: Check if search guard is installed
-#   stat: path=/usr/share/elasticsearch/plugins/search-guard-5
-#   register: search_guard_exists
-# - name: Install search guard
-#   elasticsearch_plugin:
-#     name: com.floragunn:search-guard-5:5.4.0-12
-#     plugin_bin: /usr/share/elasticsearch/bin/elasticsearch-plugin
-#     timeout: null
-#   when: not search_guard_exists.stat.exists
+- name: Check if search guard is installed
+  stat: path=/usr/share/elasticsearch/plugins/search-guard-5
+  register: search_guard_exists
+- name: Install search guard
+  elasticsearch_plugin:
+    name: com.floragunn:search-guard-5:5.4.0-12
+    plugin_bin: /usr/share/elasticsearch/bin/elasticsearch-plugin
+    timeout: null
+  when: not search_guard_exists.stat.exists
+
+# Certificates
+- name: Inject node certificate
+  copy: 
+    src: pki/{{ ansible_hostname }}-keystore.jks
+    dest: /etc/elasticsearch/{{ ansible_hostname }}-keystore.jks
+- name: Inject truststore
+  copy:
+    src: pki/truststore.jks
+    dest: /etc/elasticsearch/truststore.jks
 
 # Configure
 - name: Inject Elasticsearch configuration
   template:
     src: files/elasticsearch.yml
     dest: /etc/elasticsearch/elasticsearch.yml
+
 - name: Inject Elasticsearch jvm options
   template:
     src: files/jvm.options
     dest: /etc/elasticsearch/jvm.options
 
+# Enable
 - name: Enable the elasticsearch service
   systemd:
     name: elasticsearch
-    state: started
+    state: restarted
     enabled: true
+
+- name: Wait a few seconds for elasticsearch to properly spin up
+  pause: seconds=10
+
+# Searchguard
+
+- name: Inject Searchguard configuration
+  template:
+    src: files/{{ item }}
+    dest: /etc/elasticsearch/{{ item }}
+  with_items:
+    - sg_internal_users.yml
+    - sg_roles_mapping.yml
+    - sg_roles.yml
+    - sg_config.yml
+    - sg_action_groups.yml
+
+- name: Make sgadmin executable
+  file:
+    path: /usr/share/elasticsearch/plugins/search-guard-5/tools/sgadmin.sh
+    mode: 'u+x'
+
+- name: Populate Searchguard indices with sgadmin
+  run_once: true
+  command: 
+    /usr/share/elasticsearch/plugins/search-guard-5/tools/sgadmin.sh \
+      -cd /etc/elasticsearch \
+      -ks /etc/elasticsearch/{{ ansible_hostname }}-keystore.jks \
+      -ts /etc/elasticsearch/truststore.jks \
+      -kspass {{ truststore_pass }} \
+      -tspass {{ truststore_pass }} \
+      -cn {{ cluster_name }}
+      -icl -nhnv
