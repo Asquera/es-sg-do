@@ -20,6 +20,14 @@ Then you can install `virtualenv` with `pip`:
 sudo pip install virtualenv
 ```
 
+Next set up your Digital Ocean API key:
+
+```bash
+cp digital_ocean.ini.SAMPLE digital_ocean.ini
+```
+
+Replace `CHANGE_THIS` with the a correct API key.
+
 ## Prepare a Virtual Environment
 
 In order to properly provision and setup the machine we need to install some
