@@ -12,7 +12,10 @@
   with_inventory_hostnames: es-nodes
 
 - name: Generate client certificate
-  command: ./gen_client_node_cert.sh admin {{ ca_pass }} {{ truststore_pass }}
+  command: ./gen_client_node_cert.sh {{ item }} {{ ca_pass }} {{ truststore_pass }}
   args:
     chdir: pki/
-    creates: admin-keystore.jks
+    creates: "{{ item }}-keystore.jks"
+  with_items:
+    - admin
+    - user

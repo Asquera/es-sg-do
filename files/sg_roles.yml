@@ -58,3 +58,8 @@ sg_all_access:
   tenants:
     adm_tenant: RW
     test_tenant_ro: RW
+
+normal:
+  indices:
+    movies:
+      - "indicies:admin/get"

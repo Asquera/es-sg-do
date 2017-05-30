@@ -1,0 +1,32 @@
+# User certificates
+- name: Inject client certificates and CA chain for cluster testing    
+  copy:
+    src: "{{ item }}"
+    dest: ~/certs/
+  with_fileglob:
+    - pki/ca/chain-ca.pem
+    - pki/*.crt.pem
+    - pki/*.key.pem
+
+# Testing data
+- name: Inject testing data JSON.
+  copy:
+    src: files/item_seed.json
+    dest: ~/item_seed.json
+
+# See if data is already seeded
+- name: Check if data is seeded.
+  command: curl -k --cacert certs/chain-ca.pem --cert certs/admin.crt.pem --key certs/admin.key.pem https://0.0.0.0:9200/movies
+  run_once: true
+  register: seed_check
+
+# Seed data
+- name: Seed data
+  command: "{{ item }}"
+  when: "'error' in seed_check.stdout"
+  run_once: true
+  with_items:
+    - curl -k --cacert certs/chain-ca.pem --cert certs/admin.crt.pem --key certs/admin.key.pem -X PUT https://0.0.0.0:9200/movies
+    - curl -k --cacert certs/chain-ca.pem --cert certs/admin.crt.pem --key certs/admin.key.pem -X PUT https://0.0.0.0:9200/users
+    - curl -k --cacert certs/chain-ca.pem --cert certs/admin.crt.pem --key certs/admin.key.pem -X POST --data-binary @item_seed.json 'https://localhost:9200/movies/_bulk'
+  

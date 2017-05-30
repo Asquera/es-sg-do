@@ -3,4 +3,8 @@
 
 sg_all_access:
   users:
-    - admin
+    - CN=admin,OU=client,O=client,L=Test,C=DE
+
+normal:
+  users:
+    - user

@@ -4,7 +4,7 @@
   connection: local
   gather_facts: false
   tasks:
-    - name: Create each node
+    - name: Delete nodes
       register: jobs
       with_sequence: start=1 end={{ num_nodes }}
       digital_ocean:
@@ -13,7 +13,7 @@
         state: absent
         size_id: "{{ droplet_size }}"
         image_id: ubuntu-17-04-x64
-        region_id: fra1
+        region_id: "{{ region }}"
         unique_name: yes
         api_token: "{{ token }}"
     - name: Clean PKI

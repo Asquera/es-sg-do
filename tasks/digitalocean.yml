@@ -7,7 +7,7 @@
     state: present
     size_id: "{{ droplet_size }}"
     image_id: ubuntu-17-04-x64
-    region_id: fra1
+    region_id: "{{ region }}"
     private_networking: yes
     ssh_key_ids: "{{ users.values() | map(attribute='key_id') | list }}"
     unique_name: yes

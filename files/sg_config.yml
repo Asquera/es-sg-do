@@ -51,22 +51,22 @@
 searchguard:
   dynamic:
     authc:
+      clientcert_auth_domain:
+        enabled: true
+        order: 1
+        http_authenticator:
+          type: clientcert
+          config:
+            username_attribute: CN # optional, if omitted DN becomes username
+          challenge: false
+        authentication_backend:
+          type: noop
       basic_internal_auth_domain:
         enabled: true
-        order: 4
+        order: 2
         http_authenticator:
           type: basic
           challenge: true
         authentication_backend:
-          type: intern
-      clientcert_auth_domain:
-        enabled: false
-        order: 2
-        http_authenticator:
-          type: clientcert
-          config:
-            username_attribute: cn #optional, if omitted DN becomes username
-          challenge: false
-        authentication_backend:
-          type: noop
+          type: internal
     authz:

@@ -1,3 +1,10 @@
+# Tools
+- name: Install tools
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - jq
+
 # Java
 - name: Accept Oracle Java license
   debconf:
@@ -35,14 +42,13 @@
   when: not search_guard_exists.stat.exists
 
 # Certificates
-- name: Inject node certificate
-  copy: 
-    src: pki/{{ ansible_hostname }}-keystore.jks
-    dest: /etc/elasticsearch/{{ ansible_hostname }}-keystore.jks
-- name: Inject truststore
+- name: Inject certificates
   copy:
-    src: pki/truststore.jks
-    dest: /etc/elasticsearch/truststore.jks
+    src: "{{ item }}"
+    dest: /etc/elasticsearch/
+  with_items:
+    - pki/{{ ansible_hostname }}-keystore.jks
+    - pki/truststore.jks
 
 # Configure
 - name: Inject Elasticsearch configuration
@@ -63,10 +69,9 @@
     enabled: true
 
 - name: Wait a few seconds for elasticsearch to properly spin up
-  pause: seconds=10
+  pause: seconds=20
 
 # Searchguard
-
 - name: Inject Searchguard configuration
   template:
     src: files/{{ item }}

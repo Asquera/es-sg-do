@@ -111,7 +111,7 @@ searchguard.ssl.transport.truststore_password: {{ truststore_pass }}
 # This defines the DNs (distinguished names) of certificates
 # to which admin privileges should be assigned
 searchguard.authcz.admin_dn:
-  - "CN=admin,OU=client,O=client,l=tEst, C=De"
+  - "CN=admin,OU=client,O=client,L=Test,C=DE"
 
 # This is optional
 # Only needed when impersonation is used
