@@ -1,5 +1,6 @@
 - token: "{{ lookup('ini', 'api_token section=digital_ocean file=digital_ocean.ini') }}"
 - cluster_name: test
+- region: fra1
 - droplet_size: 1gb # 1gb, 512mb
 - es_heap_size: 500m # 1g, 500m
 - num_nodes: 2
@@ -12,3 +13,4 @@
       key_id: 6448725
 - ca_pass: asquera
 - truststore_pass: asquera
+- testing: true

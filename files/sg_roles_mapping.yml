@@ -5,6 +5,6 @@ sg_all_access:
   users:
     - CN=admin,OU=client,O=client,L=Test,C=DE
 
-normal:
+user:
   users:
     - user

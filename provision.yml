@@ -28,3 +28,4 @@
   tasks:
     - include: tasks/es-node.yml
     - include: tasks/testing.yml
+      when: testing == True
