@@ -69,6 +69,8 @@ env/bin/ansible-playbook vacate.yml
 
 > By default the scripts configure the cluster for testing. You can set `- testing: false` in the `settings.yml` to disable this.
 
+Access any host of the cluster with `ssh root@$IP` where IP is one of the IPs found via `ansible es-nodes --list`.
+
 All certs and keys are injected into machines in the `/root/certs/` directory. Log in with the `root` user and you can make requests like so:
 
 ```bash
@@ -100,3 +102,4 @@ curl -k --cacert certs/chain-ca.pem --cert certs/user.crt.pem --key certs/user.k
 curl -k --cacert certs/chain-ca.pem --cert certs/user.crt.pem --key certs/user.key.pem "https://0.0.0.0:9200/users/_search?q=*:*" | jq
 ```
 
+Modifying the `files/sg_roles.yml` and `sg_roles_mapping.yml` files allows you to modify what different users map to which roles, and what different roles are capable of.
